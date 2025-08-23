@@ -843,7 +843,6 @@ const translation = {
           url: 'Resim url\'si',
         },
         text: 'Temsilci Tarafından Oluşturulan İçerik',
-        usage: 'Model Kullanım Bilgileri',
         json: 'Aracı tarafından oluşturulan JSON',
       },
       checkList: {
@@ -997,7 +996,6 @@ const translation = {
     noLastRunFound: 'Önceki çalışmaya rastlanmadı.',
     noMatchingInputsFound: 'Son çalışmadan eşleşen giriş bulunamadı.',
     copyLastRunError: 'Son çalışma girdilerini kopyalamak başarısız oldu.',
-    lastOutput: 'Son Çıktı',
   },
 }
 

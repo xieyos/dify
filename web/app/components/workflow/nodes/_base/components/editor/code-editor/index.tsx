@@ -20,7 +20,6 @@ loader.config({ paths: { vs: `${basePath}/vs` } })
 const CODE_EDITOR_LINE_HEIGHT = 18
 
 export type Props = {
-  nodeId?: string
   value?: string | object
   placeholder?: React.JSX.Element | string
   onChange?: (value: string) => void
@@ -48,7 +47,6 @@ export const languageMap = {
 }
 
 const CodeEditor: FC<Props> = ({
-  nodeId,
   value = '',
   placeholder = '',
   onChange = noop,
@@ -177,7 +175,6 @@ const CodeEditor: FC<Props> = ({
         </div>
         : (
           <Base
-            nodeId={nodeId}
             className='relative'
             title={title}
             value={outPutValue}

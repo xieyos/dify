@@ -1,13 +1,16 @@
 import type { FC } from 'react'
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect } from 'react'
+import cn from 'classnames'
 import useBoolean from 'ahooks/lib/useBoolean'
 import { useTranslation } from 'react-i18next'
+import ConfigPrompt from '../../config-prompt'
 import { languageMap } from '../../../../workflow/nodes/_base/components/editor/code-editor/index'
-import { generateRule } from '@/service/debug'
-import type { GenRes } from '@/service/debug'
+import { generateRuleCode } from '@/service/debug'
+import type { CodeGenRes } from '@/service/debug'
 import type { ModelModeType } from '@/types/app'
 import type { AppType, CompletionParams, Model } from '@/types/app'
 import Modal from '@/app/components/base/modal'
+import Textarea from '@/app/components/base/textarea'
 import Button from '@/app/components/base/button'
 import { Generator } from '@/app/components/base/icons/src/vender/other'
 import Toast from '@/app/components/base/toast'
@@ -18,33 +21,17 @@ import { useModelListAndDefaultModelAndCurrentProviderAndModel } from '@/app/com
 import { ModelTypeEnum } from '@/app/components/header/account-setting/model-provider-page/declarations'
 import ModelParameterModal from '@/app/components/header/account-setting/model-provider-page/model-parameter-modal'
 import type { FormValue } from '@/app/components/header/account-setting/model-provider-page/declarations'
-import IdeaOutput from '../automatic/idea-output'
-import { GeneratorType } from '../automatic/types'
-import InstructionEditor from '../automatic/instruction-editor-in-workflow'
-import useGenData from '../automatic/use-gen-data'
-import Result from '../automatic/result'
-import ResPlaceholder from '../automatic/res-placeholder'
-import { useGenerateRuleTemplate } from '@/service/use-apps'
-import { useSessionStorageState } from 'ahooks'
-import s from '../automatic/style.module.css'
 
-const i18nPrefix = 'appDebug.generate'
 export type IGetCodeGeneratorResProps = {
-  flowId: string
-  nodeId: string
-  currentCode?: string
   mode: AppType
   isShow: boolean
   codeLanguages: CodeLanguage
   onClose: () => void
-  onFinished: (res: GenRes) => void
+  onFinished: (res: CodeGenRes) => void
 }
 
 export const GetCodeGeneratorResModal: FC<IGetCodeGeneratorResProps> = (
   {
-    flowId,
-    nodeId,
-    currentCode,
     mode,
     isShow,
     codeLanguages,
@@ -74,25 +61,9 @@ export const GetCodeGeneratorResModal: FC<IGetCodeGeneratorResProps> = (
   const {
     defaultModel,
   } = useModelListAndDefaultModelAndCurrentProviderAndModel(ModelTypeEnum.textGeneration)
-  const [instructionFromSessionStorage, setInstruction] = useSessionStorageState<string>(`improve-instruction-${flowId}-${nodeId}`)
-  const instruction = instructionFromSessionStorage || ''
-
-  const [ideaOutput, setIdeaOutput] = useState<string>('')
-
+  const [instruction, setInstruction] = React.useState<string>('')
   const [isLoading, { setTrue: setLoadingTrue, setFalse: setLoadingFalse }] = useBoolean(false)
-  const storageKey = `${flowId}-${nodeId}`
-  const { addVersion, current, currentVersionIndex, setCurrentVersionIndex, versions } = useGenData({
-    storageKey,
-  })
-  const [editorKey, setEditorKey] = useState(`${flowId}-0`)
-  const { data: instructionTemplate } = useGenerateRuleTemplate(GeneratorType.code)
-  useEffect(() => {
-    if (!instruction && instructionTemplate)
-      setInstruction(instructionTemplate.data)
-
-    setEditorKey(`${flowId}-${Date.now()}`)
-  }, [instructionTemplate])
-
+  const [res, setRes] = React.useState<CodeGenRes | null>(null)
   const isValid = () => {
     if (instruction.trim() === '') {
       Toast.notify({
@@ -126,6 +97,7 @@ export const GetCodeGeneratorResModal: FC<IGetCodeGeneratorResProps> = (
     localStorage.setItem('auto-gen-model', JSON.stringify(newModel))
   }, [model, setModel])
 
+  const isInLLMNode = true
   const onGenerate = async () => {
     if (!isValid())
       return
@@ -133,37 +105,25 @@ export const GetCodeGeneratorResModal: FC<IGetCodeGeneratorResProps> = (
       return
     setLoadingTrue()
     try {
-      const { error, ...res } = await generateRule({
-        flow_id: flowId,
-        node_id: nodeId,
-        current: currentCode,
+      const { error, ...res } = await generateRuleCode({
         instruction,
         model_config: model,
-        ideal_output: ideaOutput,
-        language: languageMap[codeLanguages] || 'javascript',
+        no_variable: !!isInLLMNode,
+        code_language: languageMap[codeLanguages] || 'javascript',
       })
-      if((res as any).code) // not current or current is the same as the template would return a code field
-        res.modified = (res as any).code
-
+      setRes(res)
       if (error) {
         Toast.notify({
           type: 'error',
           message: error,
         })
       }
-      else {
-        addVersion(res)
-      }
     }
     finally {
       setLoadingFalse()
     }
   }
-
-  const [isShowConfirmOverwrite, {
-    setTrue: showConfirmOverwrite,
-    setFalse: hideShowConfirmOverwrite,
-  }] = useBoolean(false)
+  const [showConfirmOverwrite, setShowConfirmOverwrite] = React.useState(false)
 
   useEffect(() => {
     if (defaultModel) {
@@ -195,20 +155,30 @@ export const GetCodeGeneratorResModal: FC<IGetCodeGeneratorResProps> = (
       <div className='text-[13px] text-text-tertiary'>{t('appDebug.codegen.loading')}</div>
     </div>
   )
+  const renderNoData = (
+    <div className='flex h-full w-0 grow flex-col items-center justify-center space-y-3 px-8'>
+      <Generator className='h-14 w-14 text-text-tertiary' />
+      <div className='text-center text-[13px] font-normal leading-5 text-text-tertiary'>
+        <div>{t('appDebug.codegen.noDataLine1')}</div>
+        <div>{t('appDebug.codegen.noDataLine2')}</div>
+      </div>
+    </div>
+  )
 
   return (
     <Modal
       isShow={isShow}
       onClose={onClose}
       className='min-w-[1140px] !p-0'
+      closable
     >
       <div className='relative flex h-[680px] flex-wrap'>
-        <div className='h-full w-[570px] shrink-0 overflow-y-auto border-r border-divider-regular p-6'>
-          <div className='mb-5'>
-            <div className={`text-lg font-bold leading-[28px] ${s.textGradient}`}>{t('appDebug.codegen.title')}</div>
+        <div className='h-full w-[570px] shrink-0 overflow-y-auto border-r border-divider-regular p-8'>
+          <div className='mb-8'>
+            <div className={'text-lg font-bold leading-[28px] text-text-primary'}>{t('appDebug.codegen.title')}</div>
             <div className='mt-1 text-[13px] font-normal text-text-tertiary'>{t('appDebug.codegen.description')}</div>
           </div>
-          <div className='mb-4'>
+          <div className='mb-8'>
             <ModelParameterModal
               popupClassName='!w-[520px]'
               portalToFollowElemContentClassName='z-[1000]'
@@ -224,60 +194,84 @@ export const GetCodeGeneratorResModal: FC<IGetCodeGeneratorResProps> = (
           </div>
           <div>
             <div className='text-[0px]'>
-              <div className='system-sm-semibold-uppercase mb-1.5 text-text-secondary'>{t('appDebug.codegen.instruction')}</div>
-              <InstructionEditor
-                editorKey={editorKey}
+              <div className='mb-2 text-sm font-medium leading-5 text-text-primary'>{t('appDebug.codegen.instruction')}</div>
+              <Textarea
+                className="h-[200px] resize-none"
+                placeholder={t('appDebug.codegen.instructionPlaceholder') || ''}
                 value={instruction}
-                onChange={setInstruction}
-                nodeId={nodeId}
-                generatorType={GeneratorType.code}
-                isShowCurrentBlock={!!currentCode}
+                onChange={e => setInstruction(e.target.value)}
               />
             </div>
-            <IdeaOutput
-              value={ideaOutput}
-              onChange={setIdeaOutput}
-            />
 
-            <div className='mt-7 flex justify-end space-x-2'>
-              <Button onClick={onClose}>{t(`${i18nPrefix}.dismiss`)}</Button>
+            <div className='mt-5 flex justify-end'>
               <Button
                 className='flex space-x-1'
                 variant='primary'
                 onClick={onGenerate}
                 disabled={isLoading}
               >
-                <Generator className='h-4 w-4' />
-                <span className='text-xs font-semibold '>{t('appDebug.codegen.generate')}</span>
+                <Generator className='h-4 w-4 text-white' />
+                <span className='text-xs font-semibold text-white'>{t('appDebug.codegen.generate')}</span>
               </Button>
             </div>
           </div>
         </div>
         {isLoading && renderLoading}
-        {!isLoading && !current && <ResPlaceholder />}
-        {(!isLoading && current) && (
-          <div className='h-full w-0 grow bg-background-default-subtle p-6 pb-0'>
-            <Result
-              current={current!}
-              currentVersionIndex={currentVersionIndex || 0}
-              setCurrentVersionIndex={setCurrentVersionIndex}
-              versions={versions || []}
-              onApply={showConfirmOverwrite}
-              generatorType={GeneratorType.code}
-            />
+        {!isLoading && !res && renderNoData}
+        {(!isLoading && res) && (
+          <div className='h-full w-0 grow p-6 pb-0'>
+            <div className='mb-3 shrink-0 text-base font-semibold leading-[160%] text-text-secondary'>{t('appDebug.codegen.resTitle')}</div>
+            <div className={cn('max-h-[555px] overflow-y-auto', !isInLLMNode && 'pb-2')}>
+              <ConfigPrompt
+                mode={mode}
+                promptTemplate={res?.code || ''}
+                promptVariables={[]}
+                readonly
+                noTitle={isInLLMNode}
+                gradientBorder
+                editorHeight={isInLLMNode ? 524 : 0}
+                noResize={isInLLMNode}
+              />
+              {!isInLLMNode && (
+                <>
+                  {res?.code && (
+                    <div className='mt-4'>
+                      <h3 className='mb-2 text-sm font-medium text-text-primary'>{t('appDebug.codegen.generatedCode')}</h3>
+                      <pre className='overflow-x-auto rounded-lg bg-gray-50 p-4'>
+                        <code className={`language-${res.language}`}>
+                          {res.code}
+                        </code>
+                      </pre>
+                    </div>
+                  )}
+                  {res?.error && (
+                    <div className='mt-4 rounded-lg bg-red-50 p-4'>
+                      <p className='text-sm text-red-600'>{res.error}</p>
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+
+            <div className='flex justify-end bg-background-default py-4'>
+              <Button onClick={onClose}>{t('common.operation.cancel')}</Button>
+              <Button variant='primary' className='ml-2' onClick={() => {
+                setShowConfirmOverwrite(true)
+              }}>{t('appDebug.codegen.apply')}</Button>
+            </div>
           </div>
         )}
       </div>
-      {isShowConfirmOverwrite && (
+      {showConfirmOverwrite && (
         <Confirm
           title={t('appDebug.codegen.overwriteConfirmTitle')}
           content={t('appDebug.codegen.overwriteConfirmMessage')}
-          isShow
+          isShow={showConfirmOverwrite}
           onConfirm={() => {
-            hideShowConfirmOverwrite()
-            onFinished(current!)
+            setShowConfirmOverwrite(false)
+            onFinished(res!)
           }}
-          onCancel={hideShowConfirmOverwrite}
+          onCancel={() => setShowConfirmOverwrite(false)}
         />
       )}
     </Modal>

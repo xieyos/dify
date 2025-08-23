@@ -1,7 +1,6 @@
 'use client'
 import { useGlobalPublicStore } from '@/context/global-public-context'
 import { useFavicon, useTitle } from 'ahooks'
-import { basePath } from '@/utils/var'
 
 export default function useDocumentTitle(title: string) {
   const isPending = useGlobalPublicStore(s => s.isGlobalPending)
@@ -16,7 +15,7 @@ export default function useDocumentTitle(title: string) {
     }
     else {
       titleStr = `${prefix}Dify`
-      favicon = `${basePath}/favicon.ico`
+      favicon = '/favicon.ico'
     }
   }
   useTitle(titleStr)

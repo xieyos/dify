@@ -176,7 +176,6 @@ const Panel: FC = () => {
       {/* right */}
       <div className='w-0 grow'>
         <Right
-          nodeId={currentFocusNodeId!}
           isValueFetching={isCurrentNodeVarValueFetching}
           currentNodeVar={currentNodeInfo as currentVarType}
           handleOpenMenu={() => setShowLeftPanel(true)}

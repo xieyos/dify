@@ -2,7 +2,7 @@ const translation = {
   title: 'Registri',
   description:
     'I registri registrano lo stato di esecuzione dell\'applicazione, inclusi input degli utenti e risposte AI.',
-  dateTimeFormat: 'MM/DD/YYYY hh:mm:ss A',
+  dateTimeFormat: 'MM/DD/YYYY hh:mm A',
   table: {
     header: {
       updatedTime: 'Ora di aggiornamento',
@@ -97,7 +97,6 @@ const translation = {
     iteration: 'Iterazione',
     finalProcessing: 'Elaborazione Finale',
   },
-  dateFormat: 'GG/MM/AAAA',
 }
 
 export default translation

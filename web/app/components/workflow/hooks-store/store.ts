@@ -49,7 +49,6 @@ type CommonHooksFnMap = {
   resetConversationVar: (varId: string) => Promise<void>
   invalidateConversationVarValues: () => void
   configsMap?: {
-    flowId: string
     conversationVarsUrl: string
     systemVarsUrl: string
   }

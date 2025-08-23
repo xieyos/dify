@@ -5,7 +5,7 @@ import type { GithubRepo } from '@/models/common'
 import { RiLoader2Line } from '@remixicon/react'
 
 const defaultData = {
-  stargazers_count: 110918,
+  stargazers_count: 98570,
 }
 
 const getStar = async () => {

@@ -716,10 +716,6 @@ const translation = {
     browse: 'navegar',
   },
   you: 'Você',
-  avatar: {
-    deleteTitle: 'Remover Avatar',
-    deleteDescription: 'Você tem certeza de que deseja remover sua foto de perfil? Sua conta usará o avatar padrão inicial.',
-  },
 }
 
 export default translation

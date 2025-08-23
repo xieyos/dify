@@ -1,7 +1,7 @@
 const translation = {
   title: 'Журнали',
   description: 'Журнали фіксують робочий статус додатка, включаючи введення користувачів та відповіді штучного інтелекту.',
-  dateTimeFormat: 'MM/DD/YYYY hh:mm:ss A',
+  dateTimeFormat: 'MM/DD/YYYY hh:mm A',
   table: {
     header: {
       updatedTime: 'Час оновлення',
@@ -93,7 +93,6 @@ const translation = {
     iteration: 'Ітерація',
     finalProcessing: 'Остаточна обробка',
   },
-  dateFormat: 'ДД/ММ/РРРР',
 }
 
 export default translation

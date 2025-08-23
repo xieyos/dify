@@ -183,7 +183,7 @@ export const useEmbeddedChatbot = () => {
 
         return {
           ...item.paragraph,
-          default: value || item.default || item.paragraph.default,
+          default: value || item.default,
           type: 'paragraph',
         }
       }
@@ -191,7 +191,7 @@ export const useEmbeddedChatbot = () => {
         const convertedNumber = Number(initInputs[item.number.variable]) ?? undefined
         return {
           ...item.number,
-          default: convertedNumber || item.default || item.number.default,
+          default: convertedNumber || item.default,
           type: 'number',
         }
       }
@@ -224,7 +224,7 @@ export const useEmbeddedChatbot = () => {
 
       return {
         ...item['text-input'],
-        default: value || item.default || item['text-input'].default,
+        default: value || item.default,
         type: 'text-input',
       }
     })

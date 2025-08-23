@@ -1,8 +1,7 @@
 const translation = {
   title: '日志',
   description: '日志记录了应用的运行情况，包括用户的输入和 AI 的回复。',
-  dateTimeFormat: 'YYYY-MM-DD HH:mm:ss',
-  dateFormat: 'YYYY-MM-DD',
+  dateTimeFormat: 'YYYY-MM-DD HH:mm',
   table: {
     header: {
       updatedTime: '更新时间',

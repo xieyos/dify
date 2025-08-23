@@ -56,6 +56,7 @@ const translation = {
         'Klucz nagłówka HTTP, Możesz pozostawić go z "Autoryzacja" jeśli nie wiesz co to jest lub ustaw go na niestandardową wartość',
       types: {
         none: 'Brak',
+        api_key: 'Klucz API',
         apiKeyPlaceholder: 'Nazwa nagłówka HTTP dla Klucza API',
         apiValuePlaceholder: 'Wprowadź Klucz API',
         api_key_query: 'Parametr zapytania',
@@ -195,8 +196,6 @@ const translation = {
       cancel: 'Anuluj',
       save: 'Zapisz',
       confirm: 'Dodaj i autoryzuj',
-      timeout: 'Limit czasu',
-      sseReadTimeout: 'Przekroczenie czasu oczekiwania na odczyt SSE',
     },
     delete: 'Usuń serwer MCP',
     deleteConfirmTitle: 'Usunąć {mcp}?',

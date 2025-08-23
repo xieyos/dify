@@ -1,7 +1,7 @@
 const translation = {
   title: 'Registros',
   description: 'Os registros registram o status de execução do aplicativo, incluindo entradas do usuário e respostas do AI.',
-  dateTimeFormat: 'MM/DD/YYYY hh:mm:ss A',
+  dateTimeFormat: 'MM/DD/YYYY hh:mm A',
   table: {
     header: {
       updatedTime: 'Hora de atualização',
@@ -95,7 +95,6 @@ const translation = {
     iteration: 'Iteração',
     toolUsed: 'Ferramenta usada',
   },
-  dateFormat: 'DD/MM/AAAA',
 }
 
 export default translation

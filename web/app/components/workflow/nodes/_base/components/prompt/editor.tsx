@@ -41,7 +41,6 @@ type Props = {
   className?: string
   headerClassName?: string
   instanceId?: string
-  nodeId?: string
   title: string | React.JSX.Element
   value: string
   onChange: (value: string) => void
@@ -84,7 +83,6 @@ const Editor: FC<Props> = ({
   className,
   headerClassName,
   instanceId,
-  nodeId,
   title,
   value,
   onChange,
@@ -161,13 +159,7 @@ const Editor: FC<Props> = ({
             <div className='flex items-center'>
               <div className='text-xs font-medium leading-[18px] text-text-tertiary'>{value?.length || 0}</div>
               {isSupportPromptGenerator && (
-                <PromptGeneratorBtn
-                  nodeId={nodeId!}
-                  className='ml-[5px]'
-                  onGenerated={onGenerated}
-                  modelConfig={modelConfig}
-                  currentPrompt={value}
-                />
+                <PromptGeneratorBtn className='ml-[5px]' onGenerated={onGenerated} modelConfig={modelConfig} />
               )}
 
               <div className='ml-2 mr-2 h-3 w-px bg-divider-regular'></div>

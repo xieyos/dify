@@ -1,6 +1,7 @@
 'use client'
 import type { FC } from 'react'
-import React, { useCallback } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
+import { uniqueId } from 'lodash-es'
 import { useTranslation } from 'react-i18next'
 import type { ModelConfig, PromptItem, Variable } from '../../../types'
 import { EditionType } from '../../../types'
@@ -13,13 +14,11 @@ import { PromptRole } from '@/models/debug'
 const i18nPrefix = 'workflow.nodes.llm'
 
 type Props = {
-  instanceId: string
   className?: string
   headerClassName?: string
   canNotChooseSystemRole?: boolean
   readOnly: boolean
   id: string
-  nodeId: string
   canRemove: boolean
   isChatModel: boolean
   isChatApp: boolean
@@ -59,13 +58,11 @@ const roleOptions = [
 const roleOptionsWithoutSystemRole = roleOptions.filter(item => item.value !== PromptRole.system)
 
 const ConfigPromptItem: FC<Props> = ({
-  instanceId,
   className,
   headerClassName,
   canNotChooseSystemRole,
   readOnly,
   id,
-  nodeId,
   canRemove,
   handleChatModeMessageRoleChange,
   isChatModel,
@@ -87,6 +84,10 @@ const ConfigPromptItem: FC<Props> = ({
   const {
     setControlPromptEditorRerenderKey,
   } = workflowStore.getState()
+  const [instanceId, setInstanceId] = useState(uniqueId())
+  useEffect(() => {
+    setInstanceId(`${id}-${uniqueId()}`)
+  }, [id])
 
   const handleGenerated = useCallback((prompt: string) => {
     onPromptChange(prompt)
@@ -135,7 +136,6 @@ const ConfigPromptItem: FC<Props> = ({
       hasSetBlockStatus={hasSetBlockStatus}
       nodesOutputVars={availableVars}
       availableNodes={availableNodes}
-      nodeId={nodeId}
       isSupportPromptGenerator={payload.role === PromptRole.system}
       onGenerated={handleGenerated}
       modelConfig={modelConfig}

@@ -715,10 +715,6 @@ const translation = {
     dropImageHere: 'Deja tu imagen aquí, o',
   },
   you: 'Tú',
-  avatar: {
-    deleteTitle: 'Eliminar Avatar',
-    deleteDescription: '¿Estás seguro de que deseas eliminar tu foto de perfil? Tu cuenta usará el avatar inicial predeterminado.',
-  },
 }
 
 export default translation

@@ -101,6 +101,7 @@ const RuleDetail: FC<{
         break
     }
     return value
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sourceData])
 
   return <div className='flex flex-col gap-1'>
@@ -195,6 +196,7 @@ const EmbeddingProcess: FC<Props> = ({ datasetId, batchId, documents = [], index
     return () => {
       stopQueryStatus()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   // get rule
@@ -332,7 +334,7 @@ const EmbeddingProcess: FC<Props> = ({ datasetId, batchId, documents = [], index
           </div>
         ))}
       </div>
-      <hr className="my-3 h-px border-0 bg-divider-subtle" />
+      <hr className="my-3 h-[1px] border-0 bg-divider-subtle" />
       <RuleDetail
         sourceData={ruleDetail}
         indexingType={indexingType}

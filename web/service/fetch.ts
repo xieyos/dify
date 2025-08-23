@@ -162,7 +162,7 @@ async function base<T>(url: string, options: FetchOptionType = {}, otherOptions:
         ...baseHooks.beforeRequest || [],
         isPublicAPI && beforeRequestPublicAuthorization,
         !isPublicAPI && !isMarketplaceAPI && beforeRequestAuthorization,
-      ].filter((h): h is BeforeRequestHook => Boolean(h)),
+      ].filter(Boolean),
       afterResponse: [
         ...baseHooks.afterResponse || [],
         afterResponseErrorCode(otherOptions),

@@ -1,7 +1,7 @@
 const translation = {
   title: 'Nhật ký',
   description: 'Nhật ký ghi lại trạng thái hoạt động của ứng dụng, bao gồm đầu vào của người dùng và phản hồi của trí tuệ nhân tạo.',
-  dateTimeFormat: 'MM/DD/YYYY hh:mm:ss A',
+  dateTimeFormat: 'MM/DD/YYYY hh:mm A',
   table: {
     header: {
       updatedTime: 'Thời gian cập nhật',
@@ -93,7 +93,6 @@ const translation = {
     agentMode: 'Chế độ đại lý',
   },
   agentLog: 'Nhật ký đại lý',
-  dateFormat: 'MM/DD/YYYY',
 }
 
 export default translation

@@ -10,7 +10,6 @@ import type {
 } from '@/app/components/workflow/types'
 import { useIsChatMode } from './use-workflow'
 import { useStoreApi } from 'reactflow'
-import type { Type } from '../nodes/llm/types'
 
 export const useWorkflowVariables = () => {
   const { t } = useTranslation()
@@ -107,7 +106,7 @@ export const useWorkflowVariableType = () => {
       isChatMode,
       isConstant: false,
     })
-    return type as unknown as Type
+    return type
   }
 
   return getVarType

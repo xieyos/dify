@@ -716,10 +716,6 @@ const translation = {
     supportedFormats: 'Поддерживает PNG, JPG, JPEG, WEBP и GIF',
   },
   you: 'Ты',
-  avatar: {
-    deleteTitle: 'Удалить аватар',
-    deleteDescription: 'Вы уверены, что хотите удалить свою фотографию профиля? Ваш аккаунт будет использовать стандартный аватар.',
-  },
 }
 
 export default translation

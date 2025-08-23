@@ -1,5 +1,5 @@
 import React from 'react'
-import ChartView from './chart-view'
+import ChartView from './chartView'
 import TracingPanel from './tracing/panel'
 import ApikeyInfoPanel from '@/app/components/app/overview/apikey-info-panel'
 

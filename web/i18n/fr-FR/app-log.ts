@@ -1,7 +1,7 @@
 const translation = {
   title: 'Journaux',
   description: 'Les journaux enregistrent l\'état d\'exécution de l\'application, y compris les entrées utilisateur et les réponses de l\'IA.',
-  dateTimeFormat: 'MM/DD/YYYY hh:mm:ss A',
+  dateTimeFormat: 'MM/DD/YYYY hh:mm A',
   table: {
     header: {
       updatedTime: 'Heure de mise à jour',
@@ -93,7 +93,6 @@ const translation = {
     iteration: 'Itération',
     finalProcessing: 'Traitement final',
   },
-  dateFormat: 'JJ/MM/YYYY',
 }
 
 export default translation

@@ -259,7 +259,7 @@ const ReasoningConfigForm: React.FC<Props> = ({
                 className='h-8 grow'
                 type='number'
                 value={varInput?.value || ''}
-                onChange={e => handleValueChange(variable, type)(e.target.value)}
+                onChange={handleValueChange(variable, type)}
                 placeholder={placeholder?.[language] || placeholder?.en_US}
               />
             )}

@@ -70,7 +70,6 @@ export default function LanguagePage() {
           items={languages.filter(item => item.supported)}
           onSelect={item => handleSelectLanguage(item)}
           disabled={editing}
-          notClearable={true}
         />
       </div>
       <div className='mb-8'>
@@ -80,7 +79,6 @@ export default function LanguagePage() {
           items={timezones}
           onSelect={item => handleSelectTimezone(item)}
           disabled={editing}
-          notClearable={true}
         />
       </div>
     </>

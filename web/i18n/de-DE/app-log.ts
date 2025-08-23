@@ -1,8 +1,7 @@
 const translation = {
   title: 'Protokolle',
   description: 'Die Protokolle zeichnen den Betriebsstatus der Anwendung auf, einschließlich Benutzereingaben und KI-Antworten.',
-  dateTimeFormat: 'MM/DD/YYYY hh:mm:ss A',
-  dateFormat: 'MM/DD/YYYY',
+  dateTimeFormat: 'MM/DD/YYYY hh:mm A',
   table: {
     header: {
       updatedTime: 'Aktualisierungszeit',

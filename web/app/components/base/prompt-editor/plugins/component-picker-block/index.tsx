@@ -17,11 +17,8 @@ import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext
 import { LexicalTypeaheadMenuPlugin } from '@lexical/react/LexicalTypeaheadMenuPlugin'
 import type {
   ContextBlockType,
-  CurrentBlockType,
-  ErrorMessageBlockType,
   ExternalToolBlockType,
   HistoryBlockType,
-  LastRunBlockType,
   QueryBlockType,
   VariableBlockType,
   WorkflowVariableBlockType,
@@ -35,10 +32,6 @@ import type { PickerBlockMenuOption } from './menu'
 import VarReferenceVars from '@/app/components/workflow/nodes/_base/components/variable/var-reference-vars'
 import { useEventEmitterContextContext } from '@/context/event-emitter'
 import { KEY_ESCAPE_COMMAND } from 'lexical'
-import { INSERT_CURRENT_BLOCK_COMMAND } from '../current-block'
-import { GeneratorType } from '@/app/components/app/configuration/config/automatic/types'
-import { INSERT_ERROR_MESSAGE_BLOCK_COMMAND } from '../error-message-block'
-import { INSERT_LAST_RUN_BLOCK_COMMAND } from '../last-run-block'
 
 type ComponentPickerProps = {
   triggerString: string
@@ -48,9 +41,6 @@ type ComponentPickerProps = {
   variableBlock?: VariableBlockType
   externalToolBlock?: ExternalToolBlockType
   workflowVariableBlock?: WorkflowVariableBlockType
-  currentBlock?: CurrentBlockType
-  errorMessageBlock?: ErrorMessageBlockType
-  lastRunBlock?: LastRunBlockType
   isSupportFileVar?: boolean
 }
 const ComponentPicker = ({
@@ -61,9 +51,6 @@ const ComponentPicker = ({
   variableBlock,
   externalToolBlock,
   workflowVariableBlock,
-  currentBlock,
-  errorMessageBlock,
-  lastRunBlock,
   isSupportFileVar,
 }: ComponentPickerProps) => {
   const { eventEmitter } = useEventEmitterContextContext()
@@ -100,9 +87,6 @@ const ComponentPicker = ({
     variableBlock,
     externalToolBlock,
     workflowVariableBlock,
-    currentBlock,
-    errorMessageBlock,
-    lastRunBlock,
   )
 
   const onSelectOption = useCallback(
@@ -128,23 +112,12 @@ const ComponentPicker = ({
       if (needRemove)
         needRemove.remove()
     })
-    const isFlat = variables.length === 1
-    if(isFlat) {
-      const varName = variables[0]
-      if(varName === 'current')
-        editor.dispatchCommand(INSERT_CURRENT_BLOCK_COMMAND, currentBlock?.generatorType)
-      else if (varName === 'error_message')
-        editor.dispatchCommand(INSERT_ERROR_MESSAGE_BLOCK_COMMAND, null)
-      else if (varName === 'last_run')
-        editor.dispatchCommand(INSERT_LAST_RUN_BLOCK_COMMAND, null)
-    }
-    else if (variables[1] === 'sys.query' || variables[1] === 'sys.files') {
+
+    if (variables[1] === 'sys.query' || variables[1] === 'sys.files')
       editor.dispatchCommand(INSERT_WORKFLOW_VARIABLE_BLOCK_COMMAND, [variables[1]])
-    }
-    else {
+    else
       editor.dispatchCommand(INSERT_WORKFLOW_VARIABLE_BLOCK_COMMAND, variables)
-    }
-  }, [editor, currentBlock?.generatorType, checkForTriggerMatch, triggerString])
+  }, [editor, checkForTriggerMatch, triggerString])
 
   const handleClose = useCallback(() => {
     const escapeEvent = new KeyboardEvent('keydown', { key: 'Escape' })
@@ -193,7 +166,6 @@ const ComponentPicker = ({
                         onClose={handleClose}
                         onBlur={handleClose}
                         autoFocus={false}
-                        isInCodeGeneratorInstructionEditor={currentBlock?.generatorType === GeneratorType.code}
                       />
                     </div>
                   )
@@ -234,7 +206,7 @@ const ComponentPicker = ({
         }
       </>
     )
-  }, [allFlattenOptions.length, workflowVariableBlock?.show, floatingStyles, isPositioned, refs, workflowVariableOptions, isSupportFileVar, handleClose, currentBlock?.generatorType, handleSelectWorkflowVariable, queryString])
+  }, [allFlattenOptions.length, workflowVariableBlock?.show, refs, isPositioned, floatingStyles, queryString, workflowVariableOptions, handleSelectWorkflowVariable, handleClose, isSupportFileVar])
 
   return (
     <LexicalTypeaheadMenuPlugin

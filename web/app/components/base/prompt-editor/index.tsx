@@ -1,7 +1,7 @@
 'use client'
 
 import type { FC } from 'react'
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 import type {
   EditorState,
 } from 'lexical'
@@ -39,22 +39,6 @@ import {
   WorkflowVariableBlockNode,
   WorkflowVariableBlockReplacementBlock,
 } from './plugins/workflow-variable-block'
-import {
-  CurrentBlock,
-  CurrentBlockNode,
-  CurrentBlockReplacementBlock,
-} from './plugins/current-block'
-import {
-  ErrorMessageBlock,
-  ErrorMessageBlockNode,
-  ErrorMessageBlockReplacementBlock,
-} from './plugins/error-message-block'
-import {
-  LastRunBlock,
-  LastRunBlockNode,
-  LastRunReplacementBlock,
-} from './plugins/last-run-block'
-
 import VariableBlock from './plugins/variable-block'
 import VariableValueBlock from './plugins/variable-value-block'
 import { VariableValueBlockNode } from './plugins/variable-value-block/node'
@@ -64,11 +48,8 @@ import UpdateBlock from './plugins/update-block'
 import { textToEditorState } from './utils'
 import type {
   ContextBlockType,
-  CurrentBlockType,
-  ErrorMessageBlockType,
   ExternalToolBlockType,
   HistoryBlockType,
-  LastRunBlockType,
   QueryBlockType,
   VariableBlockType,
   WorkflowVariableBlockType,
@@ -85,7 +66,7 @@ export type PromptEditorProps = {
   compact?: boolean
   wrapperClassName?: string
   className?: string
-  placeholder?: string | React.JSX.Element
+  placeholder?: string | JSX.Element
   placeholderClassName?: string
   style?: React.CSSProperties
   value?: string
@@ -99,9 +80,6 @@ export type PromptEditorProps = {
   variableBlock?: VariableBlockType
   externalToolBlock?: ExternalToolBlockType
   workflowVariableBlock?: WorkflowVariableBlockType
-  currentBlock?: CurrentBlockType
-  errorMessageBlock?: ErrorMessageBlockType
-  lastRunBlock?: LastRunBlockType
   isSupportFileVar?: boolean
 }
 
@@ -124,9 +102,6 @@ const PromptEditor: FC<PromptEditorProps> = ({
   variableBlock,
   externalToolBlock,
   workflowVariableBlock,
-  currentBlock,
-  errorMessageBlock,
-  lastRunBlock,
   isSupportFileVar,
 }) => {
   const { eventEmitter } = useEventEmitterContextContext()
@@ -144,9 +119,6 @@ const PromptEditor: FC<PromptEditorProps> = ({
       QueryBlockNode,
       WorkflowVariableBlockNode,
       VariableValueBlockNode,
-      CurrentBlockNode,
-      ErrorMessageBlockNode,
-      LastRunBlockNode, // LastRunBlockNode is used for error message block replacement
     ],
     editorState: textToEditorState(value || ''),
     onError: (error: Error) => {
@@ -206,9 +178,6 @@ const PromptEditor: FC<PromptEditorProps> = ({
           variableBlock={variableBlock}
           externalToolBlock={externalToolBlock}
           workflowVariableBlock={workflowVariableBlock}
-          currentBlock={currentBlock}
-          errorMessageBlock={errorMessageBlock}
-          lastRunBlock={lastRunBlock}
           isSupportFileVar={isSupportFileVar}
         />
         <ComponentPickerBlock
@@ -219,9 +188,6 @@ const PromptEditor: FC<PromptEditorProps> = ({
           variableBlock={variableBlock}
           externalToolBlock={externalToolBlock}
           workflowVariableBlock={workflowVariableBlock}
-          currentBlock={currentBlock}
-          errorMessageBlock={errorMessageBlock}
-          lastRunBlock={lastRunBlock}
           isSupportFileVar={isSupportFileVar}
         />
         {
@@ -262,35 +228,6 @@ const PromptEditor: FC<PromptEditorProps> = ({
               <WorkflowVariableBlock {...workflowVariableBlock} />
               <WorkflowVariableBlockReplacementBlock {...workflowVariableBlock} />
             </>
-          )
-        }
-        {
-          currentBlock?.show && (
-            <>
-              <CurrentBlock {...currentBlock} />
-              <CurrentBlockReplacementBlock {...currentBlock} />
-            </>
-          )
-        }
-        {
-          errorMessageBlock?.show && (
-            <>
-              <ErrorMessageBlock {...errorMessageBlock} />
-              <ErrorMessageBlockReplacementBlock {...errorMessageBlock} />
-            </>
-          )
-        }
-        {
-          lastRunBlock?.show && (
-            <>
-              <LastRunBlock {...lastRunBlock} />
-              <LastRunReplacementBlock {...lastRunBlock} />
-            </>
-          )
-        }
-        {
-          isSupportFileVar && (
-            <VariableValueBlock />
           )
         }
         <OnChangePlugin onChange={handleEditorChange} />

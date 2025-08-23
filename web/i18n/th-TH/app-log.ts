@@ -1,7 +1,7 @@
 const translation = {
   title: 'บันทึก',
   description: 'บันทึกบันทึกสถานะการทํางานของแอปพลิเคชัน รวมถึงการป้อนข้อมูลของผู้ใช้และการตอบกลับ AI',
-  dateTimeFormat: 'MM/DD/YYYY hh:mm:ss A',
+  dateTimeFormat: 'MM/DD/YYYY hh:mm A',
   table: {
     header: {
       updatedTime: 'อัพเดทเวลา',
@@ -93,7 +93,6 @@ const translation = {
     iteration: 'เกิด ซ้ำ',
     finalProcessing: 'การประมวลผลขั้นสุดท้าย',
   },
-  dateFormat: 'วัน/เดือน/ปี',
 }
 
 export default translation

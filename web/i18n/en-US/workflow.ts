@@ -894,7 +894,6 @@ const translation = {
       },
       outputVars: {
         text: 'agent generated content',
-        usage: 'Model Usage Information',
         files: {
           title: 'agent generated files',
           type: 'Support type. Now only support image',
@@ -989,7 +988,6 @@ const translation = {
       chatNode: 'Conversation',
       systemNode: 'System',
     },
-    lastOutput: 'Last Output',
     relations: {
       dependencies: 'Dependencies',
       dependents: 'Dependents',

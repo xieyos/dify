@@ -18,7 +18,6 @@ import InstallFromMarketplace from '../plugins/install-plugin/install-from-marke
 import type { Plugin } from '../plugins/types'
 import { Command } from 'cmdk'
 import CommandSelector from './command-selector'
-import { SlashCommandProvider } from './actions/commands'
 
 type Props = {
   onHide?: () => void
@@ -32,7 +31,7 @@ const GotoAnything: FC<Props> = ({
   const { t } = useTranslation()
   const [show, setShow] = useState<boolean>(false)
   const [searchQuery, setSearchQuery] = useState<string>('')
-  const [cmdVal, setCmdVal] = useState<string>('_')
+  const [cmdVal, setCmdVal] = useState<string>('')
   const inputRef = useRef<HTMLInputElement>(null)
 
   // Filter actions based on context
@@ -43,8 +42,9 @@ const GotoAnything: FC<Props> = ({
       return AllActions
     }
     else {
-      const { app, knowledge, plugin, slash } = AllActions
-      return { app, knowledge, plugin, slash }
+      // Exclude node action on non-workflow pages
+      const { app, knowledge, plugin } = AllActions
+      return { app, knowledge, plugin }
     }
   }, [isWorkflowPage])
 
@@ -82,18 +82,14 @@ const GotoAnything: FC<Props> = ({
     wait: 300,
   })
 
-  const isCommandsMode = searchQuery.trim() === '@' || searchQuery.trim() === '/'
-    || (searchQuery.trim().startsWith('@') && !matchAction(searchQuery.trim(), Actions))
-    || (searchQuery.trim().startsWith('/') && !matchAction(searchQuery.trim(), Actions))
+  const isCommandsMode = searchQuery.trim() === '@'
 
   const searchMode = useMemo(() => {
     if (isCommandsMode) return 'commands'
 
     const query = searchQueryDebouncedValue.toLowerCase()
     const action = matchAction(query, Actions)
-    return action
-      ? (action.key === '/' ? '@command' : action.key)
-      : 'general'
+    return action ? action.key : 'general'
   }, [searchQueryDebouncedValue, Actions, isCommandsMode])
 
   const { data: searchResults = [], isLoading, isError, error } = useQuery(
@@ -118,14 +114,9 @@ const GotoAnything: FC<Props> = ({
     },
   )
 
-  // Prevent automatic selection of the first option when cmdVal is not set
-  const clearSelection = () => {
-    setCmdVal('_')
-  }
-
   const handleCommandSelect = useCallback((commandKey: string) => {
     setSearchQuery(`${commandKey} `)
-    clearSelection()
+    setCmdVal('')
     setTimeout(() => {
       inputRef.current?.focus()
     }, 0)
@@ -137,12 +128,6 @@ const GotoAnything: FC<Props> = ({
     setSearchQuery('')
 
     switch (result.type) {
-      case 'command': {
-        // Execute slash commands
-        const action = Actions.slash
-        action?.action?.(result)
-        break
-      }
       case 'plugin':
         setActivePlugin(result.data)
         break
@@ -207,7 +192,7 @@ const GotoAnything: FC<Props> = ({
           </div>
           <div className='mt-1 text-xs text-text-quaternary'>
             {isCommandSearch
-              ? t('app.gotoAnything.emptyState.tryDifferentTerm')
+              ? t('app.gotoAnything.emptyState.tryDifferentTerm', { mode: searchMode })
               : t('app.gotoAnything.emptyState.trySpecificSearch', { shortcuts: Object.values(Actions).map(action => action.shortcut).join(', ') })
             }
           </div>
@@ -237,29 +222,28 @@ const GotoAnything: FC<Props> = ({
         inputRef.current?.focus()
       })
     }
+    return () => {
+      setCmdVal('')
+    }
   }, [show])
 
   return (
     <>
-      <SlashCommandProvider />
       <Modal
         isShow={show}
         onClose={() => {
           setShow(false)
           setSearchQuery('')
-          clearSelection()
           onHide?.()
         }}
         closable={false}
         className='!w-[480px] !p-0'
-        highPriority={true}
       >
         <div className='flex flex-col rounded-2xl border border-components-panel-border bg-components-panel-bg shadow-xl'>
           <Command
             className='outline-none'
             value={cmdVal}
             onValueChange={setCmdVal}
-            disablePointerSelection
           >
             <div className='flex items-center gap-3 border-b border-divider-subtle bg-components-panel-bg-blur px-4 py-3'>
               <RiSearchLine className='h-4 w-4 text-text-quaternary' />
@@ -269,9 +253,8 @@ const GotoAnything: FC<Props> = ({
                   value={searchQuery}
                   placeholder={t('app.gotoAnything.searchPlaceholder')}
                   onChange={(e) => {
+                    setCmdVal('')
                     setSearchQuery(e.target.value)
-                    if (!e.target.value.startsWith('@') && !e.target.value.startsWith('/'))
-                      clearSelection()
                   }}
                   className='flex-1 !border-0 !bg-transparent !shadow-none'
                   wrapperClassName='flex-1 !border-0 !bg-transparent'
@@ -318,47 +301,43 @@ const GotoAnything: FC<Props> = ({
                     <CommandSelector
                       actions={Actions}
                       onCommandSelect={handleCommandSelect}
-                      searchFilter={searchQuery.trim().substring(1)}
-                      commandValue={cmdVal}
-                      onCommandValueChange={setCmdVal}
                     />
                   ) : (
                     Object.entries(groupedResults).map(([type, results], groupIndex) => (
-                      <Command.Group key={groupIndex} heading={(() => {
-                        const typeMap: Record<string, string> = {
-                          'app': 'app.gotoAnything.groups.apps',
-                          'plugin': 'app.gotoAnything.groups.plugins',
-                          'knowledge': 'app.gotoAnything.groups.knowledgeBases',
-                          'workflow-node': 'app.gotoAnything.groups.workflowNodes',
-                          'command': 'app.gotoAnything.groups.commands',
-                        }
-                        return t(typeMap[type] || `${type}s`)
-                      })()} className='p-2 capitalize text-text-secondary'>
-                        {results.map(result => (
-                          <Command.Item
-                            key={`${result.type}-${result.id}`}
-                            value={result.title}
-                            className='flex cursor-pointer items-center gap-3 rounded-md p-3 will-change-[background-color] aria-[selected=true]:bg-state-base-hover data-[selected=true]:bg-state-base-hover'
-                            onSelect={() => handleNavigate(result)}
-                          >
-                            {result.icon}
-                            <div className='min-w-0 flex-1'>
-                              <div className='truncate font-medium text-text-secondary'>
-                                {result.title}
+                    <Command.Group key={groupIndex} heading={(() => {
+                      const typeMap: Record<string, string> = {
+                        'app': 'app.gotoAnything.groups.apps',
+                        'plugin': 'app.gotoAnything.groups.plugins',
+                        'knowledge': 'app.gotoAnything.groups.knowledgeBases',
+                        'workflow-node': 'app.gotoAnything.groups.workflowNodes',
+                      }
+                      return t(typeMap[type] || `${type}s`)
+                    })()} className='p-2 capitalize text-text-secondary'>
+                      {results.map(result => (
+                        <Command.Item
+                          key={`${result.type}-${result.id}`}
+                          value={result.title}
+                          className='flex cursor-pointer items-center gap-3 rounded-md p-3 will-change-[background-color] aria-[selected=true]:bg-state-base-hover data-[selected=true]:bg-state-base-hover'
+                          onSelect={() => handleNavigate(result)}
+                        >
+                          {result.icon}
+                          <div className='min-w-0 flex-1'>
+                            <div className='truncate font-medium text-text-secondary'>
+                              {result.title}
+                            </div>
+                            {result.description && (
+                              <div className='mt-0.5 truncate text-xs text-text-quaternary'>
+                                {result.description}
                               </div>
-                              {result.description && (
-                                <div className='mt-0.5 truncate text-xs text-text-quaternary'>
-                                  {result.description}
-                                </div>
-                              )}
-                            </div>
-                            <div className='text-xs capitalize text-text-quaternary'>
-                              {result.type}
-                            </div>
-                          </Command.Item>
-                        ))}
-                      </Command.Group>
-                    ))
+                            )}
+                          </div>
+                          <div className='text-xs capitalize text-text-quaternary'>
+                            {result.type}
+                          </div>
+                        </Command.Item>
+                      ))}
+                    </Command.Group>
+                  ))
                   )}
                   {!isCommandsMode && emptyResult}
                   {!isCommandsMode && defaultUI}
@@ -377,7 +356,7 @@ const GotoAnything: FC<Props> = ({
                         {t('app.gotoAnything.resultCount', { count: searchResults.length })}
                         {searchMode !== 'general' && (
                           <span className='ml-2 opacity-60'>
-                            {t('app.gotoAnything.inScope', { scope: searchMode.replace('@', '') })}
+{t('app.gotoAnything.inScope', { scope: searchMode.replace('@', '') })}
                           </span>
                         )}
                       </>

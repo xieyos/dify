@@ -13,7 +13,7 @@ import Tooltip from '@/app/components/base/tooltip'
 import { AppType } from '@/types/app'
 import { getNewVar, getVars } from '@/utils/var'
 import AutomaticBtn from '@/app/components/app/configuration/config/automatic/automatic-btn'
-import type { GenRes } from '@/service/debug'
+import type { AutomaticRes } from '@/service/debug'
 import GetAutomaticResModal from '@/app/components/app/configuration/config/automatic/get-automatic-res'
 import PromptEditor from '@/app/components/base/prompt-editor'
 import ConfigContext from '@/context/debug-configuration'
@@ -61,7 +61,6 @@ const Prompt: FC<ISimplePromptInput> = ({
 
   const { eventEmitter } = useEventEmitterContextContext()
   const {
-    appId,
     modelConfig,
     dataSets,
     setModelConfig,
@@ -140,21 +139,21 @@ const Prompt: FC<ISimplePromptInput> = ({
   }
 
   const [showAutomatic, { setTrue: showAutomaticTrue, setFalse: showAutomaticFalse }] = useBoolean(false)
-  const handleAutomaticRes = (res: GenRes) => {
+  const handleAutomaticRes = (res: AutomaticRes) => {
     // put eventEmitter in first place to prevent overwrite the configs.prompt_variables.But another problem is that prompt won't hight the prompt_variables.
     eventEmitter?.emit({
       type: PROMPT_EDITOR_UPDATE_VALUE_BY_EVENT_EMITTER,
-      payload: res.modified,
+      payload: res.prompt,
     } as any)
     const newModelConfig = produce(modelConfig, (draft) => {
-      draft.configs.prompt_template = res.modified
-      draft.configs.prompt_variables = (res.variables || []).map(key => ({ key, name: key, type: 'string', required: true }))
+      draft.configs.prompt_template = res.prompt
+      draft.configs.prompt_variables = res.variables.map(key => ({ key, name: key, type: 'string', required: true }))
     })
     setModelConfig(newModelConfig)
     setPrevPromptConfig(modelConfig.configs)
 
     if (mode !== AppType.completion) {
-      setIntroduction(res.opening_statement || '')
+      setIntroduction(res.opening_statement)
       const newFeatures = produce(features, (draft) => {
         draft.opening = {
           ...draft.opening,
@@ -273,13 +272,10 @@ const Prompt: FC<ISimplePromptInput> = ({
 
       {showAutomatic && (
         <GetAutomaticResModal
-          flowId={appId}
           mode={mode as AppType}
           isShow={showAutomatic}
           onClose={showAutomaticFalse}
           onFinished={handleAutomaticRes}
-          currentPrompt={promptTemplate}
-          isBasicMode
         />
       )}
     </div>

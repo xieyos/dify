@@ -843,7 +843,6 @@ const translation = {
         },
         json: 'Kod JSON wygenerowany przez agenta',
         text: 'Treści generowane przez agentów',
-        usage: 'Informacje o użyciu modelu',
       },
       checkList: {
         strategyNotSelected: 'Nie wybrano strategii',
@@ -996,7 +995,6 @@ const translation = {
     noLastRunFound: 'Nie znaleziono poprzedniego biegu.',
     noMatchingInputsFound: 'Nie znaleziono pasujących danych wejściowych z ostatniego uruchomienia',
     copyLastRunError: 'Nie udało się skopiować danych wejściowych z ostatniego uruchomienia',
-    lastOutput: 'Ostatni wynik',
   },
 }
 

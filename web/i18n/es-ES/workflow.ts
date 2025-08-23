@@ -843,7 +843,6 @@ const translation = {
         },
         json: 'JSON generado por el agente',
         text: 'Contenido generado por el agente',
-        usage: 'Información de uso del modelo',
       },
       checkList: {
         strategyNotSelected: 'Estrategia no seleccionada',
@@ -996,7 +995,6 @@ const translation = {
     copyLastRunError: 'No se pudo copiar las entradas de la última ejecución',
     copyLastRun: 'Copiar última ejecución',
     noMatchingInputsFound: 'No se encontraron entradas coincidentes de la última ejecución.',
-    lastOutput: 'Última salida',
   },
 }
 
